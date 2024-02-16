@@ -16,23 +16,28 @@ echo "Credits: Yevonnael Andrew, Kevin Hobert, Charles Lim."
 
 echo ""
 
-echo "
-    /\
-   /  \
-  |    |
-  |NASA|
-  |    |
-  |    |
-  |    |
- '      `
- |      |
- |      |
- |______|
+echo ""
+
+cat << 'EOF'
+     _
+    / \
+   /   \
+  |     |
+  | SGU |
+  | IHP |
+  |     |
+  |  @  |
+ ;'  @  `;
+ |   x   |
+ |   x   |
+ |_______|
   '-`'-`   .
-  / . \'\ . .'
+  / . \' . .'
  ''( .'\.' ' .;'
 '.;.;' ;'.;' ..;;'
-"
+EOF
+
+echo ""
 
 read -p "One more.. Do you understand that this script is for learning purpose only?? (y/n) " -r
 if [[ ! $REPLY =~ ^[Yy]$ ]]
@@ -152,7 +157,38 @@ if [ -f "$FLAG_FILE" ]; then
     sudo docker run -p 22:22/tcp -p 23:23/tcp -v cowrie-etc:/cowrie/cowrie-git/etc -v cowrie-var:/cowrie/cowrie-git/var -d --cap-drop=ALL --read-only --restart unless-stopped 103.175.218.193:5000/cowrie
 
     read -p "Now we will install MongoDB" -r
-    
+    sudo apt-get install gnupg curl -y
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg \
+   --dearmor
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+    sudo apt-get update -y
+
+    sudo apt-get install -y mongodb-org
+    sudo systemctl start mongod
+    sudo systemctl enable mongod
+
+    # Enable MongoDB authentication
+    echo "Enabling MongoDB authentication..."
+    sudo sed -i '/security:/a \  authorization: enabled' /etc/mongod.conf
+    sudo systemctl restart mongod
+   
+    # Wait for MongoDB to restart
+    echo "Sleep for 5 seconds..."
+    sleep 5
+   
+    # Create a MongoDB admin user (adjust username and password as needed)
+    echo "Creating MongoDB user..."
+    mongo <<EOF
+    use admin
+    db.createUser({
+        user: 'myAdminUser',
+        pwd: 'myAdminPassword',
+        roles: [{ role: 'userAdminAnyDatabase', db: 'admin' }, 'readWriteAnyDatabase']
+    })
+    EOF
+   
+    echo "MongoDB installation and user creation completed."
     
     read -p "The next step is to install fluentd -> processinsg and sending log data" -r
     cd fluent && sudo rm -f fluent.conf && sudo wget https://raw.githubusercontent.com/yevonnaelandrew/hpot_gui_raw/main/fluent.conf
