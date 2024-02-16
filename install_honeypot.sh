@@ -171,11 +171,6 @@ if [ -f "$FLAG_FILE" ]; then
     # Enable MongoDB authentication
     echo "Enabling MongoDB authentication..."
     sudo sed -i '/security:/a \  authorization: enabled' /etc/mongod.conf
-    sudo systemctl restart mongod
-   
-    # Wait for MongoDB to restart
-    echo "Sleep for 5 seconds..."
-    sleep 5
    
     # Create a MongoDB admin user (adjust username and password as needed)
     echo "Creating MongoDB user..."
@@ -187,6 +182,12 @@ if [ -f "$FLAG_FILE" ]; then
         roles: [{ role: 'userAdminAnyDatabase', db: 'admin' }, 'readWriteAnyDatabase']
     })
     EOF
+
+    sudo systemctl restart mongod
+   
+    # Wait for MongoDB to restart
+    echo "Sleep for 5 seconds..."
+    sleep 5
    
     echo "MongoDB installation and user creation completed."
     
