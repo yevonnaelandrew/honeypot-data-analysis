@@ -174,14 +174,8 @@ if [ -f "$FLAG_FILE" ]; then
    
     # Create a MongoDB admin user (adjust username and password as needed)
     echo "Creating MongoDB user..."
-    mongo <<EOF
-    use admin
-    db.createUser({
-        user: 'myAdminUser',
-        pwd: 'myAdminPassword',
-        roles: [{ role: 'userAdminAnyDatabase', db: 'admin' }, 'readWriteAnyDatabase']
-    })
-    EOF
+    mongoCmd="db.createUser({user: 'sgu', pwd: 'workshop-sgu', roles: [{role: 'userAdminAnyDatabase', db: 'admin'}, 'readWriteAnyDatabase']})"
+    mongo --eval "$mongoCmd"
 
     sudo systemctl restart mongod
    
