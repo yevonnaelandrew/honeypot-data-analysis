@@ -156,7 +156,7 @@ if [ -f "$FLAG_FILE" ]; then
 
     sudo docker run -p 22:22/tcp -p 23:23/tcp -v cowrie-etc:/cowrie/cowrie-git/etc -v cowrie-var:/cowrie/cowrie-git/var -d --cap-drop=ALL --read-only --restart unless-stopped 103.175.218.193:5000/cowrie
 
-    read -p "Now we will install MongoDB" -r
+    read -p "Now we will install MongoDB (press any keys to continue)" -r
     sudo apt-get install gnupg curl -y
     curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
    sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg \
@@ -168,24 +168,12 @@ if [ -f "$FLAG_FILE" ]; then
     sudo systemctl start mongod
     sudo systemctl enable mongod
 
-    # Enable MongoDB authentication
-    echo "Enabling MongoDB authentication..."
-    sudo sed -i '/security:/a \  authorization: enabled' /etc/mongod.conf
-   
-    # Create a MongoDB admin user (adjust username and password as needed)
-    echo "Creating MongoDB user..."
-    mongoCmd="db.createUser({user: 'sgu', pwd: 'workshop-sgu', roles: [{role: 'userAdminAnyDatabase', db: 'admin'}, 'readWriteAnyDatabase']})"
-    mongo --eval "$mongoCmd"
-
-    sudo systemctl restart mongod
-   
-    # Wait for MongoDB to restart
     echo "Sleep for 5 seconds..."
     sleep 5
    
     echo "MongoDB installation and user creation completed."
     
-    read -p "The next step is to install fluentd -> processinsg and sending log data" -r
+    read -p "The next step is to install fluentd -> processinsg and sending log data (press any keys to continue)" -r
     cd fluent && sudo rm -f fluent.conf && sudo wget https://raw.githubusercontent.com/yevonnaelandrew/hpot_gui_raw/main/fluent.conf
     echo "User id untuk database:"
     read replace_id
