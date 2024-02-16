@@ -173,18 +173,8 @@ if [ -f "$FLAG_FILE" ]; then
    
     echo "MongoDB installation and user creation completed."
     
-    read -p "The next step is to install fluentd -> processinsg and sending log data (press any keys to continue)" -r
-    cd fluent && sudo rm -f fluent.conf && sudo wget https://raw.githubusercontent.com/yevonnaelandrew/hpot_gui_raw/main/fluent.conf
-    echo "User id untuk database:"
-    read replace_id
-    echo "Password untuk database:"
-    read replace_pass
-    echo "Nama tenant/db (masukkan persis sesuai yang dikasih):"
-    read replace_db
-
-    sudo sed -i "s/fillthename/$replace_id/g" fluent.conf
-    sudo sed -i "s/fillthepass/$replace_pass/g" fluent.conf
-    sudo sed -i "s/fillthedb/$replace_db/g" fluent.conf
+    read -p "Configuring fluent ... (press any keys to continue)" -r
+    cd fluent && sudo rm -f fluent.conf && sudo wget https://raw.githubusercontent.com/yevonnaelandrew/honeypot-data-analysis/main/fluent.conf
     
 else
     echo "Starting the script normally."
