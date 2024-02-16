@@ -10,10 +10,31 @@ echo '
                       /___//_/
 '
 
-echo "This script was made for honeypot workshop conducted by SGU and IHP"
-echo "Credits: Yevonnael Andrew, Kevin Hobert, Charles Lim"
+echo "This script was made for honeypot workshop conducted by SGU and IHP."
+echo "Anytime you have problems, please feel free to raise your hand to ask questions."
+echo "Credits: Yevonnael Andrew, Kevin Hobert, Charles Lim."
 
-read -p "Do you understand that this code is for learning purpose only?? (y/n) " -r
+echo ""
+
+echo "
+    /\
+   /  \
+  |    |
+  |NASA|
+  |    |
+  |    |
+  |    |
+ '      `
+ |      |
+ |      |
+ |______|
+  '-`'-`   .
+  / . \'\ . .'
+ ''( .'\.' ' .;'
+'.;.;' ;'.;' ..;;'
+"
+
+read -p "One more.. Do you understand that this script is for learning purpose only?? (y/n) " -r
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
     echo "Operation cancelled by the user."
@@ -116,47 +137,24 @@ if [ -f "$FLAG_FILE" ]; then
         exit 1
     fi
 
-    read -p "After this step, your SSH port will be changed into 228888. Make sure the port is opened there. Do you understand? (y/n) " -r
+    read -p "After this step, your SSH port will be changed into 22888. Make sure the port is opened there. Do you understand? (y/n)" -r
+    read -p "Next time you login, please use ssh root@your-ip -P 22888. Ok? (y/n)" -r
 
     echo '{ "insecure-registries":["103.175.218.193:5000"] }' | sudo tee /etc/docker/daemon.json && sudo systemctl restart docker
 
     sudo sed -i -e "s/#Port 22/Port 22888/g" /etc/ssh/sshd_config && sudo service sshd restart
 
     sudo docker pull 103.175.218.193:5000/cowrie:latest
-    sudo docker pull 103.175.218.193:5000/conpot:latest
-    sudo docker pull 103.175.218.193:5000/rdpy:latest
-    sudo docker pull 103.175.218.193:5000/elasticpot:latest
-    sudo docker pull 103.175.218.193:5000/dionaea:latest
-    sudo docker pull 103.175.218.193:5000/honeytrap:latest
 
     sudo docker volume create cowrie-var
     sudo docker volume create cowrie-etc
-    sudo mkdir /var/lib/docker/volumes/rdpy /var/lib/docker/volumes/rdpy/_data
-    sudo docker volume create gridpot
-    sudo mkdir /var/lib/docker/volumes/elasticpot /var/lib/docker/volumes/elasticpot/_data
 
     sudo docker run -p 22:22/tcp -p 23:23/tcp -v cowrie-etc:/cowrie/cowrie-git/etc -v cowrie-var:/cowrie/cowrie-git/var -d --cap-drop=ALL --read-only --restart unless-stopped 103.175.218.193:5000/cowrie
 
-    sudo docker run -it -p 21:21 -p 42:42 -p 69:69/udp -p 80:80 -p 135:135 -p 443:443 -p 445:445 -p 1433:1433 -p 1723:1723 -p 1883:1883 -p 1900:1900/udp -p 3306:3306 -p 5060:5060 -p 5060:5060/udp -p 5061:5061 -p 11211:11211 -v dionaea:/opt/dionaea -d --restart unless-stopped 103.175.218.193:5000/dionaea
-
-    sudo docker run -it -p 3389:3389 -v rdpy:/var/log -d --restart unless-stopped 103.175.218.193:5000/rdpy /bin/sh -c 'python /rdpy/bin/rdpy-rdphoneypot.py -l 3389 /rdpy/bin/1 >> /var/log/rdpy.log'
-
-    sudo docker run -it -p 9200:9200/tcp -v elasticpot:/elasticpot/log -d --restart unless-stopped 103.175.218.193:5000/elasticpot /bin/sh -c 'cd elasticpot; python3 elasticpot.py'
-
-    sudo docker run -it -p 2222:2222 -p 8545:8545 -p 5900:5900 -p 25:25 -p 5037:5037 -p 631:631 -p 389:389 -p 6379:6379 -v honeytrap:/home -d --restart unless-stopped 103.175.218.193:5000/honeytrap
-
-    sudo docker run -d --restart always -v conpot:/data -p 8000:8800 -p 10201:10201 -p 5020:5020 -p 16100:16100/udp -p 47808:47808/udp -p 6230:6230/udp -p 2121:2121 -p 6969:6969/udp -p 44818:44818 103.175.218.193:5000/conpot
-
-    sudo apt-get install python3-pip -y
-    git clone https://github.com/yevonnaelandrew/ewsposter && cd ewsposter && git checkout dionaea_fluentd && sudo pip3 install -r requirements.txt && sudo pip3 install influxdb && cd ..
-    mkdir ewsposter_data ewsposter_data/log ewsposter_data/spool ewsposter_data/json
-    current_dir=$(pwd)
-    nodeid=$(hostname)
-    sed -i "s|/home/ubuntu|$current_dir|g" ewsposter/ews.cfg
-    sed -i "s|ASEAN-ID-SGU|$nodeid|g" ewsposter/ews.cfg
-    cd ewsposter
-    (crontab -l 2>/dev/null; echo "*/5 * * * * cd ${current_dir}/ewsposter && /usr/bin/python3 ews.py >> ews.log 2>&1") | sudo crontab -
-    cd ..
+    read -p "Now we will install MongoDB" -r
+    
+    
+    read -p "The next step is to install fluentd -> processinsg and sending log data" -r
     cd fluent && sudo rm -f fluent.conf && sudo wget https://raw.githubusercontent.com/yevonnaelandrew/hpot_gui_raw/main/fluent.conf
     echo "User id untuk database:"
     read replace_id
@@ -168,18 +166,6 @@ if [ -f "$FLAG_FILE" ]; then
     sudo sed -i "s/fillthename/$replace_id/g" fluent.conf
     sudo sed -i "s/fillthepass/$replace_pass/g" fluent.conf
     sudo sed -i "s/fillthedb/$replace_db/g" fluent.conf
-    
-    cd
-    wget https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu22.04_all.deb
-    sudo dpkg -i zabbix-release_6.4-1+ubuntu22.04_all.deb
-    sudo apt update -y
-    sudo apt install zabbix-agent2 zabbix-agent2-plugin-* -y
-    sudo systemctl restart zabbix-agent2
-    sudo systemctl enable zabbix-agent2
-
-    sudo sed -i '/^ServerActive=/c\ServerActive=103.19.110.157' /etc/zabbix/zabbix_agent2.conf || echo 'ServerActive=103.19.110.157' | sudo tee -a /etc/zabbix/zabbix_agent2.conf
-    sudo sed -i "/^Hostname=/c\Hostname=${replace_db}" /etc/zabbix/zabbix_agent2.conf || echo "Hostname=${replace_db}" | sudo tee -a /etc/zabbix/zabbix_agent2.conf
-    sudo systemctl restart zabbix-agent2
     
 else
     echo "Starting the script normally."
